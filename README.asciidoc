@@ -1,4 +1,0 @@
-A battery info
-==============
-
-Parses sysfs and shows battery information.
