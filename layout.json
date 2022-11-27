@@ -1,0 +1,78 @@
+{
+ "info": {"version": 1, "license": "GPL-2.0-or-later", "author": "Cyril Hrubis <metan@ucw.cz>"},
+ "layout": {
+  "type": "vbox",
+  "widgets": [
+   {
+    "type": "frame",
+    "align": "hfill",
+    "title": "Battery info",
+    "widget": {
+     "cols": 2,
+     "rows": 4,
+     "rpad": "5 * 0",
+     "widgets": [
+      {"type": "label", "halign": "right", "tattr": "bold", "text": "Status:"},
+      {"type": "label", "halign": "right", "tattr": "bold", "text": "Voltage:"},
+      {"type": "label", "halign": "right", "tattr": "bold", "text": "Current avg:"},
+      {"type": "label", "halign": "right", "tattr": "bold", "text": "Technology:"},
+      {"type": "label", "uid": "status", "text": "Unknown"},
+      {"type": "label", "uid": "voltage", "text": " 0.000000 V"},
+      {"type": "label", "uid": "current_avg", "text": " 0.000000 A"},
+      {"type": "label", "uid": "technology", "text": "Unknown"}
+     ]
+    }
+   },
+   {
+    "type": "frame",
+    "align": "fill",
+    "title": "Batttery energy",
+    "widget": {
+     "type": "vbox",
+     "align": "hfill",
+     "widgets": [
+      {
+       "cols": 2,
+       "rows": 5,
+       "rpad": "6 * 0",
+       "widgets": [
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "Energy now:"},
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "Energy full:"},
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "Energy design:"},
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "Power now:"},
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "Avg time rem:"},
+        {"type": "label", "uid": "energy_now", "text": " 0000.000 mWh"},
+        {"type": "label", "uid": "energy_full", "text": " 0000.000 mWh"},
+        {"type": "label", "uid": "energy_design", "text": " 0000.000 mWh"},
+        {"type": "label", "uid": "power_now", "text": " 0000 mW"},
+        {"type": "label", "uid": "time_rem", "text": "00:00:00"}
+       ]
+      },
+      {"type": "pbar", "uid": "energy_pbar", "unit": "percents", "align": "fill"}
+     ]
+    }
+   },
+   {
+    "type": "frame",
+    "align": "fill",
+    "title": "Battery wear",
+    "widget": {
+     "type": "vbox",
+     "align": "hfill",
+     "widgets": [
+      {
+       "cols": 2,
+       "rows": 1,
+       "rpad": "2 * 0",
+       "widgets": [
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "Cycle count:"},
+        {"type": "label", "uid": "cycle_count", "text": "Unknown"}
+       ]
+      },
+      {"type": "pbar", "uid": "wear_pbar", "unit": "percents", "align": "fill"}
+     ]
+    }
+   }
+  ]
+ }
+}
