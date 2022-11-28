@@ -17,6 +17,11 @@
 
 #include "power_supply.h"
 
+enum files_present {
+	FILE_CURRENT = 0x02,
+	FILE_POWER = 0x04,
+};
+
 static ssize_t read_line(int dir_fd, const char *fname, char *buf, ssize_t buf_len)
 {
 	int fd = openat(dir_fd, fname, O_RDONLY);
@@ -148,20 +153,40 @@ static void fill_string(int dir_fd, const char *fname, char *dest, size_t dest_l
 static void bat_refresh(struct ps *ps)
 {
 	ps->bat.status = get_bat_status(ps->dir_fd);
-	ps->bat.voltage = get_uint32(ps->dir_fd, "voltage_now");
-	ps->bat.energy_now = get_uint32(ps->dir_fd, "energy_now");
+	ps->bat.voltage_now = get_uint32(ps->dir_fd, "voltage_now");
+	ps->bat.current_now = get_uint32(ps->dir_fd, "current_now");
 	ps->bat.power_now = get_uint32(ps->dir_fd, "power_now");
 
-	ps->bat.power_avg += ((int32_t)ps->bat.power_now - (int32_t)ps->bat.power_avg) / 8;
-	ps->bat.voltage_avg += ((int32_t)ps->bat.voltage - (int32_t)ps->bat.voltage_avg) / 8;
+	if (ps->bat.state_type == PS_BAT_ENERGY)
+		ps->bat.state_now = get_uint32(ps->dir_fd, "energy_now");
+	else
+		ps->bat.state_now = get_uint32(ps->dir_fd, "charge_now");
 
+	ps->bat.power_avg += ((int32_t)ps->bat.power_now - (int32_t)ps->bat.power_avg) / 8;
+	ps->bat.voltage_avg += ((int32_t)ps->bat.voltage_now - (int32_t)ps->bat.voltage_avg) / 8;
+	ps->bat.current_avg += ((int32_t)ps->bat.current_now - (int32_t)ps->bat.current_avg) / 8;
 }
 
 static void bat_populate(struct ps *ps)
 {
+	if (!faccessat(ps->dir_fd, "energy_full_design", F_OK, 0))
+		ps->bat.state_type = PS_BAT_ENERGY;
+
+	if (!faccessat(ps->dir_fd, "current_now", F_OK, 0))
+		ps->bat.idx |= FILE_CURRENT;
+
+	if (!faccessat(ps->dir_fd, "power_now", F_OK, 0))
+		ps->bat.idx |= FILE_POWER;
+
+	if (ps->bat.state_type == PS_BAT_ENERGY) {
+		ps->bat.state_design = get_uint32(ps->dir_fd, "energy_full_design");
+		ps->bat.state_full = get_uint32(ps->dir_fd, "energy_full");
+	} else {
+		ps->bat.state_design = get_uint32(ps->dir_fd, "charge_full_design");
+		ps->bat.state_full = get_uint32(ps->dir_fd, "charge_full");
+	}
+
 	ps->bat.cycle_count = get_uint32(ps->dir_fd, "cycle_count");
-	ps->bat.energy_full = get_uint32(ps->dir_fd, "energy_full");
-	ps->bat.energy_design = get_uint32(ps->dir_fd, "energy_full_design");
 	fill_string(ps->dir_fd, "technology", ps->bat.technology, sizeof(ps->bat.technology));
 
 	ps->bat.voltage_avg = get_uint32(ps->dir_fd, "voltage_now");
@@ -169,30 +194,87 @@ static void bat_populate(struct ps *ps)
 	bat_refresh(ps);
 }
 
+uint32_t ps_bat_power_avg(struct ps *ps)
+{
+	if (ps->bat.idx & FILE_POWER)
+		return ps->bat.power_avg;
+
+	if (ps->bat.idx & FILE_CURRENT)
+		return (ps->bat.voltage_avg/1000)  * (ps->bat.current_avg/1000);
+
+	return 0;
+}
+
+uint32_t ps_bat_power_now(struct ps *ps)
+{
+	if (ps->bat.idx & FILE_POWER)
+		return ps->bat.power_now;
+
+	if (ps->bat.idx & FILE_CURRENT)
+		return (ps->bat.voltage_now/1000) * (ps->bat.current_now/1000);
+
+	return 0;
+}
+
 uint32_t ps_bat_sec_rem(struct ps *ps)
 {
 	uint64_t diff;
+	uint32_t div;
 
 	switch (ps->bat.status) {
 	case PS_BAT_CHARGING:
-		diff = ps->bat.energy_full - ps->bat.energy_now;
+		diff = ps->bat.state_full - ps->bat.state_now;
 	break;
 	case PS_BAT_DISCHARGING:
-		diff = ps->bat.energy_now;
+		diff = ps->bat.state_now;
 	break;
 	default:
 		return 0;
 	}
 
-	return 3600 * diff / ps->bat.power_avg;
+	switch (ps->bat.state_type) {
+	case PS_BAT_CHARGE:
+		div = ps->bat.current_avg;
+	break;
+	case PS_BAT_ENERGY:
+		div = ps->bat.power_avg;
+	break;
+	default:
+		return 0;
+	}
+
+	if (!div)
+		return 0;
+
+	return (3600 * diff) / div;
 }
 
 uint32_t ps_bat_current_avg(struct ps *ps)
 {
+	if (ps->bat.idx & FILE_CURRENT)
+		return ps->bat.current_avg;
+
+	if (!(ps->bat.idx & FILE_POWER))
+		return 0;
+
 	if (!ps->bat.voltage_avg)
 		return 0;
 
 	return 1000000 * (uint64_t)ps->bat.power_avg / ps->bat.voltage_avg;
+}
+
+uint32_t ps_bat_current_now(struct ps *ps)
+{
+	if (ps->bat.idx & FILE_CURRENT)
+		return ps->bat.current_now;
+
+	if (!(ps->bat.idx & FILE_POWER))
+		return 0;
+
+	if (!ps->bat.voltage_now)
+		return 0;
+
+	return 1000000 * (uint64_t)ps->bat.power_now / ps->bat.voltage_now;
 }
 
 static void mains_refresh(struct ps *ps)
@@ -297,6 +379,7 @@ struct ps *ps_init(enum ps_type type_filter)
 void ps_print(struct ps *root)
 {
 	struct ps *i;
+	const char *unit;
 
 	for (i = root; i; i = i->next) {
 		printf("Power source:\t%s\n", ps_type_name(i->type));
@@ -304,15 +387,16 @@ void ps_print(struct ps *root)
 
 		switch (i->type) {
 		case PS_BATTERY:
+			unit = ps_bat_state_unit(i);
 			printf("\n");
 			printf("Cycle count:\t%u\n", i->bat.cycle_count);
-			printf("Voltage:\t%u.%u V\n", i->bat.voltage/1000000, i->bat.voltage%1000000);
+			printf("Voltage:\t%u.%u V\n", i->bat.voltage_now/1000000, i->bat.voltage_now%1000000);
 			printf("Technology:\t%s\n", i->bat.technology);
 			printf("\n");
 			printf("Status:\t\t%s\n", ps_bat_status_name(i->bat.status));
-			printf("Energy now:\t%u.%u mWh\n", i->bat.energy_now/1000, i->bat.energy_now%1000);
-			printf("Energy full:\t%u.%u mWh\n", i->bat.energy_full/1000, i->bat.energy_full%1000);
-			printf("Energy design:\t%u.%u mWh\n", i->bat.energy_design/1000, i->bat.energy_design%1000);
+			printf("State now:\t%u.%u m%s\n", i->bat.state_now/1000, i->bat.state_now%1000, unit);
+			printf("State full:\t%u.%u m%s\n", i->bat.state_full/1000, i->bat.state_full%1000, unit);
+			printf("State design:\t%u.%u m%s\n", i->bat.state_design/1000, i->bat.state_design%1000, unit);
 		break;
 		case PS_MAINS:
 			printf("\n");

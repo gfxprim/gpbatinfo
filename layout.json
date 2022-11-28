@@ -36,14 +36,14 @@
        "rows": 5,
        "rpad": "6 * 0",
        "widgets": [
-        {"type": "label", "halign": "right", "tattr": "bold", "text": "Energy now:"},
-        {"type": "label", "halign": "right", "tattr": "bold", "text": "Energy full:"},
-        {"type": "label", "halign": "right", "tattr": "bold", "text": "Energy design:"},
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "State now:"},
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "State full:"},
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "State design:"},
         {"type": "label", "halign": "right", "tattr": "bold", "text": "Power now:"},
         {"type": "label", "halign": "right", "tattr": "bold", "text": "Avg time rem:"},
-        {"type": "label", "uid": "energy_now", "text": " 0000.000 mWh"},
-        {"type": "label", "uid": "energy_full", "text": " 0000.000 mWh"},
-        {"type": "label", "uid": "energy_design", "text": " 0000.000 mWh"},
+        {"type": "label", "uid": "state_now", "text": " 0000.000 mWh"},
+        {"type": "label", "uid": "state_full", "text": " 0000.000 mWh"},
+        {"type": "label", "uid": "state_design", "text": " 0000.000 mWh"},
         {"type": "label", "uid": "power_now", "text": " 0000 mW"},
         {"type": "label", "uid": "time_rem", "text": "00:00:00"}
        ]

@@ -18,9 +18,9 @@ struct bat {
 	gp_widget *technology;
 	gp_widget *cycle_count;
 
-	gp_widget *energy_now;
-	gp_widget *energy_full;
-	gp_widget *energy_design;
+	gp_widget *state_now;
+	gp_widget *state_full;
+	gp_widget *state_design;
 	gp_widget *energy_pbar;
 	gp_widget *power_now;
 	gp_widget *time_rem;
@@ -40,32 +40,36 @@ static gp_app_info app_info = {
 
 static void update(void)
 {
+	const char *unit = ps_bat_state_unit(ps);
+
 	if (bat.status)
 		gp_widget_label_set(bat.status, ps_bat_status_name(ps->bat.status));
 
 	if (bat.voltage)
-		gp_widget_label_printf(bat.voltage, "%u.%03u V", ps->bat.voltage/1000000, (ps->bat.voltage%1000000)/1000);
+		gp_widget_label_printf(bat.voltage, "%u.%03u V", ps->bat.voltage_now/1000000, (ps->bat.voltage_now%1000000)/1000);
 
 	if (bat.current_avg) {
 		uint32_t current_avg = ps_bat_current_avg(ps);
 		gp_widget_label_printf(bat.current_avg, "%u.%03u A", current_avg/1000000, (current_avg%1000000)/1000);
 	}
 
-	if (bat.energy_now)
-		gp_widget_label_printf(bat.energy_now, "%u mWh", ps->bat.energy_now/1000);
+	if (bat.state_now)
+		gp_widget_label_printf(bat.state_now, "%u m%s", ps->bat.state_now/1000, unit);
 
-	if (bat.energy_full)
-		gp_widget_label_printf(bat.energy_full, "%u mWh", ps->bat.energy_full/1000);
+	if (bat.state_full)
+		gp_widget_label_printf(bat.state_full, "%u m%s", ps->bat.state_full/1000, unit);
 
-	if (bat.energy_design)
-		gp_widget_label_printf(bat.energy_design, "%u mWh", ps->bat.energy_design/1000);
+	if (bat.state_design)
+		gp_widget_label_printf(bat.state_design, "%u m%s", ps->bat.state_design/1000, unit);
 
-	if (bat.power_now)
-		gp_widget_label_printf(bat.power_now, "%u mW", ps->bat.power_now/1000);
+	if (bat.power_now) {
+		uint32_t power_now = ps_bat_power_now(ps);
+		gp_widget_label_printf(bat.power_now, "%u mW", power_now/1000);
+	}
 
 	if (bat.energy_pbar) {
-		gp_widget_pbar_set_max(bat.energy_pbar, ps->bat.energy_full);
-		gp_widget_pbar_set(bat.energy_pbar, ps->bat.energy_now);
+		gp_widget_pbar_set_max(bat.energy_pbar, ps->bat.state_full);
+		gp_widget_pbar_set(bat.energy_pbar, ps->bat.state_now);
 	}
 
 	if (bat.time_rem) {
@@ -106,9 +110,9 @@ int main(int argc, char *argv[])
 	bat.technology = gp_widget_by_uid(uids, "technology", GP_WIDGET_LABEL);
 	bat.cycle_count = gp_widget_by_uid(uids, "cycle_count", GP_WIDGET_LABEL);
 
-	bat.energy_now = gp_widget_by_uid(uids, "energy_now", GP_WIDGET_LABEL);
-	bat.energy_full = gp_widget_by_uid(uids, "energy_full", GP_WIDGET_LABEL);
-	bat.energy_design = gp_widget_by_uid(uids, "energy_design", GP_WIDGET_LABEL);
+	bat.state_now = gp_widget_by_uid(uids, "state_now", GP_WIDGET_LABEL);
+	bat.state_full = gp_widget_by_uid(uids, "state_full", GP_WIDGET_LABEL);
+	bat.state_design = gp_widget_by_uid(uids, "state_design", GP_WIDGET_LABEL);
 	bat.power_now = gp_widget_by_uid(uids, "power_now", GP_WIDGET_LABEL);
 	bat.energy_pbar = gp_widget_by_uid(uids, "energy_pbar", GP_WIDGET_PROGRESSBAR);
 	bat.time_rem = gp_widget_by_uid(uids, "time_rem", GP_WIDGET_LABEL);
@@ -122,8 +126,8 @@ int main(int argc, char *argv[])
 	gp_widget *wear_pbar = gp_widget_by_uid(uids, "wear_pbar", GP_WIDGET_PROGRESSBAR);
 
 	if (wear_pbar) {
-		gp_widget_pbar_set_max(wear_pbar, ps->bat.energy_design);
-		gp_widget_pbar_set(wear_pbar, ps->bat.energy_full);
+		gp_widget_pbar_set_max(wear_pbar, ps->bat.state_design);
+		gp_widget_pbar_set(wear_pbar, ps->bat.state_full);
 	}
 
 	update();
