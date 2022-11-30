@@ -6,20 +6,35 @@
    {
     "type": "frame",
     "align": "hfill",
-    "title": "Battery info",
+    "title": "Battery status",
     "widget": {
-     "cols": 2,
-     "rows": 4,
-     "rpad": "5 * 0",
+     "type": "vbox",
      "widgets": [
-      {"type": "label", "halign": "right", "tattr": "bold", "text": "Status:"},
-      {"type": "label", "halign": "right", "tattr": "bold", "text": "Voltage:"},
-      {"type": "label", "halign": "right", "tattr": "bold", "text": "Current avg:"},
-      {"type": "label", "halign": "right", "tattr": "bold", "text": "Technology:"},
-      {"type": "label", "uid": "status", "text": "Unknown"},
-      {"type": "label", "uid": "voltage", "text": " 0.000000 V"},
-      {"type": "label", "uid": "current_avg", "text": " 0.000000 A"},
-      {"type": "label", "uid": "technology", "text": "Unknown"}
+      {"cols": 2, "rows": 1, "rpad": "2 * 0",
+       "widgets": [
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "Status:"},
+        {"type": "label", "uid": "status", "text": "Unknown"}
+       ]
+      },
+      {"cols": 3, "rows": 4,
+       "rpad": "5 * 0",
+       "widgets": [
+	null,
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "Voltage:"},
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "Current:"},
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "Power:"},
+
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "now", "align": "center"},
+        {"type": "label", "uid": "voltage_now", "text": "00.000 V"},
+        {"type": "label", "uid": "current_now", "text": "0.000 A"},
+        {"type": "label", "uid": "power_now", "text": "00000 mW"},
+
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "avg", "align": "center"},
+	{"type": "label", "uid": "voltage_avg", "text": "00.000 V"},
+        {"type": "label", "uid": "current_avg", "text": "0.000 A"},
+        {"type": "label", "uid": "power_avg", "text": "00000 mW"}
+       ]
+      }
      ]
     }
    },
@@ -33,18 +48,16 @@
      "widgets": [
       {
        "cols": 2,
-       "rows": 5,
-       "rpad": "6 * 0",
+       "rows": 4,
+       "rpad": "4 * 0, 1",
        "widgets": [
         {"type": "label", "halign": "right", "tattr": "bold", "text": "State now:"},
         {"type": "label", "halign": "right", "tattr": "bold", "text": "State full:"},
         {"type": "label", "halign": "right", "tattr": "bold", "text": "State design:"},
-        {"type": "label", "halign": "right", "tattr": "bold", "text": "Power now:"},
         {"type": "label", "halign": "right", "tattr": "bold", "text": "Avg time rem:"},
         {"type": "label", "uid": "state_now", "text": " 0000.000 mWh"},
         {"type": "label", "uid": "state_full", "text": " 0000.000 mWh"},
         {"type": "label", "uid": "state_design", "text": " 0000.000 mWh"},
-        {"type": "label", "uid": "power_now", "text": " 0000 mW"},
         {"type": "label", "uid": "time_rem", "text": "00:00:00"}
        ]
       },
@@ -62,10 +75,12 @@
      "widgets": [
       {
        "cols": 2,
-       "rows": 1,
-       "rpad": "2 * 0",
+       "rows": 2,
+       "rpad": "2 * 0, 1",
        "widgets": [
+        {"type": "label", "halign": "right", "tattr": "bold", "text": "Technology:"},
         {"type": "label", "halign": "right", "tattr": "bold", "text": "Cycle count:"},
+        {"type": "label", "uid": "technology", "text": "Unknown"},
         {"type": "label", "uid": "cycle_count", "text": "Unknown"}
        ]
       },
