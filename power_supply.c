@@ -150,6 +150,8 @@ static void fill_string(int dir_fd, const char *fname, char *dest, size_t dest_l
 	dest[ret < 1 ? 0 : ret-1] = 0;
 }
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 static void bat_refresh(struct ps *ps)
 {
 	ps->bat.status = get_bat_status(ps->dir_fd);
@@ -161,6 +163,8 @@ static void bat_refresh(struct ps *ps)
 		ps->bat.state_now = get_uint32(ps->dir_fd, "energy_now");
 	else
 		ps->bat.state_now = get_uint32(ps->dir_fd, "charge_now");
+
+	ps->bat.state_full = MAX(ps->bat.state_full, ps->bat.state_now);
 
 	ps->bat.power_avg += ((int32_t)ps->bat.power_now - (int32_t)ps->bat.power_avg) / 8;
 	ps->bat.voltage_avg += ((int32_t)ps->bat.voltage_now - (int32_t)ps->bat.voltage_avg) / 8;
