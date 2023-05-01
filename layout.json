@@ -19,20 +19,20 @@
       {"cols": 3, "rows": 4,
        "rpad": "5 * 0",
        "widgets": [
-	null,
+        null,
         {"type": "label", "halign": "right", "tattr": "bold", "text": "Voltage:"},
         {"type": "label", "halign": "right", "tattr": "bold", "text": "Current:"},
         {"type": "label", "halign": "right", "tattr": "bold", "text": "Power:"},
 
         {"type": "label", "halign": "right", "tattr": "bold", "text": "now", "align": "center"},
-        {"type": "label", "uid": "voltage_now", "text": "00.000 V"},
-        {"type": "label", "uid": "current_now", "text": "0.000 A"},
-        {"type": "label", "uid": "power_now", "text": "00000 mW"},
+        {"type": "label", "halign": "right", "uid": "voltage_now", "text": "00.000 V"},
+        {"type": "label", "halign": "right", "uid": "current_now", "text": "0.000 A"},
+        {"type": "label", "halign": "right", "uid": "power_now", "text": "00000 mW"},
 
         {"type": "label", "halign": "right", "tattr": "bold", "text": "avg", "align": "center"},
-	{"type": "label", "uid": "voltage_avg", "text": "00.000 V"},
-        {"type": "label", "uid": "current_avg", "text": "0.000 A"},
-        {"type": "label", "uid": "power_avg", "text": "00000 mW"}
+        {"type": "label", "halign": "right", "uid": "voltage_avg", "text": "00.000 V"},
+        {"type": "label", "halign": "right", "uid": "current_avg", "text": "0.000 A"},
+        {"type": "label", "halign": "right", "uid": "power_avg", "text": "00000 mW"}
        ]
       }
      ]
