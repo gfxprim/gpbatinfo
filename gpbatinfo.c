@@ -101,7 +101,7 @@ static uint32_t refresh_callback(gp_timer *self)
 	ps_refresh(ps);
 	update();
 
-	return 0;
+	return self->period;
 }
 
 static gp_timer refresh_tmr = {
