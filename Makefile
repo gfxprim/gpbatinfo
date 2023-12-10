@@ -1,14 +1,11 @@
 CFLAGS?=-W -Wall -Wextra -O2
 CFLAGS+=$(shell gfxprim-config --cflags)
 BIN=gpbatinfo
-$(BIN): LDLIBS=-lgfxprim $(shell gfxprim-config --libs-widgets)
+$(BIN): LDLIBS=-lgfxprim $(shell gfxprim-config --libs-widgets) -lsysinfo
 SOURCES=$(wildcard *.c)
 DEP=$(SOURCES:.c=.dep)
 
-all: batinfo $(BIN) $(DEP)
-
-$(BIN): power_supply.o
-batinfo: power_supply.o
+all: $(BIN) $(DEP)
 
 %.dep: %.c
 	$(CC) $(CFLAGS) -M $< -o $@
@@ -22,5 +19,5 @@ install:
 	#install -D -m 644 $(BIN).png -t $(DESTDIR)/usr/share/gpcalc/
 
 clean:
-	rm -f $(BIN) batinfo *.dep *.o
+	rm -f $(BIN) *.dep *.o
 

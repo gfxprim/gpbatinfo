@@ -7,7 +7,7 @@
  */
 
 #include <gfxprim.h>
-#include "power_supply.h"
+#include <sysinfo/power_supply.h>
 
 static struct ps *ps;
 
