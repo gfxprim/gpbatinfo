@@ -29,7 +29,7 @@ struct bat {
 	gp_widget *time_rem;
 } bat;
 
-static gp_app_info app_info = {
+gp_app_info app_info = {
 	.name = "gpbatinfo",
 	.desc = "Battery information",
 	.version = "1.0",
@@ -114,11 +114,14 @@ int main(int argc, char *argv[])
 {
 	gp_htable *uids;
 	gp_widget *layout = gp_app_layout_load("gpbatinfo", &uids);
-	gp_app_info_set(&app_info);
+
+	gp_widgets_getopt(&argc, &argv);
 
 	ps = ps_init(PS_BATTERY);
-	if (!ps)
+	if (!ps) {
 		gp_dialog_msg_run(GP_DIALOG_MSG_ERR, "Error", "Battery not found!");
+		return 0;
+	}
 
 	bat.status = gp_widget_by_uid(uids, "status", GP_WIDGET_LABEL);
 	bat.technology = gp_widget_by_uid(uids, "technology", GP_WIDGET_LABEL);
@@ -153,7 +156,7 @@ int main(int argc, char *argv[])
 
 	gp_widgets_timer_ins(&refresh_tmr);
 
-	gp_widgets_main_loop(layout, "gpbatinfo", NULL, argc, argv);
+	gp_widgets_main_loop(layout, NULL, 0, NULL);
 
 	return 0;
 }
