@@ -84,8 +84,8 @@ static void update(void)
 	}
 
 	if (bat.energy_pbar) {
-		gp_widget_pbar_set_max(bat.energy_pbar, ps->bat.state_full);
-		gp_widget_pbar_set(bat.energy_pbar, ps->bat.state_now);
+		gp_widget_pbar_max_set(bat.energy_pbar, ps->bat.state_full);
+		gp_widget_pbar_val_set(bat.energy_pbar, ps->bat.state_now);
 	}
 
 	if (bat.time_rem) {
@@ -148,8 +148,8 @@ int main(int argc, char *argv[])
 	gp_widget *wear_pbar = gp_widget_by_uid(uids, "wear_pbar", GP_WIDGET_PROGRESSBAR);
 
 	if (wear_pbar) {
-		gp_widget_pbar_set_max(wear_pbar, ps->bat.state_design);
-		gp_widget_pbar_set(wear_pbar, ps->bat.state_full);
+		gp_widget_pbar_max_set(wear_pbar, ps->bat.state_design);
+		gp_widget_pbar_val_set(wear_pbar, ps->bat.state_full);
 	}
 
 	gp_htable_free(uids);
