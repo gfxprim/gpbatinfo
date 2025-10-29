@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
 
 	gp_htable_free(uids);
 
-	gp_widgets_timer_ins(&refresh_tmr);
+	gp_app_timer_start(&refresh_tmr);
 
 	gp_widgets_main_loop(layout, NULL, 0, NULL);
 
